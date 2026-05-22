@@ -161,59 +161,59 @@ export default function RequestsPage() {
   const tdClass = "px-2.5 py-1.5 text-center"
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors">
       <AdminNav />
       <div className="px-4 py-5">
-        <h1 className="text-lg font-bold text-gray-900 mb-3">구매신청 목록</h1>
+        <h1 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-3">구매신청 목록</h1>
 
         {/* 필터 */}
-        <div className="bg-white rounded-xl shadow-sm p-3 mb-3">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-3 mb-3">
           <div className="flex flex-wrap gap-2 mb-2">
             <div className="flex flex-col gap-0.5">
-              <label className="text-[11px] text-gray-400">통합검색</label>
+              <label className="text-[11px] text-gray-400 dark:text-gray-500">통합검색</label>
               <input
                 type="text"
                 value={filter.search}
                 onChange={e => set('search', e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && handleSearch()}
                 placeholder="예금주 / 주문번호 / 구매자"
-                className="border border-gray-200 rounded-md px-2.5 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-gray-900 w-52"
+                className="border border-gray-200 dark:border-gray-600 rounded-md px-2.5 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-gray-900 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-400 w-52"
               />
             </div>
             <div className="flex flex-col gap-0.5">
-              <label className="text-[11px] text-gray-400">상태</label>
+              <label className="text-[11px] text-gray-400 dark:text-gray-500">상태</label>
               <select value={filter.status} onChange={e => set('status', e.target.value)}
-                className="border border-gray-200 rounded-md px-2.5 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-gray-900 w-28">
+                className="border border-gray-200 dark:border-gray-600 rounded-md px-2.5 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-gray-900 dark:bg-gray-700 dark:text-gray-100 w-28">
                 <option value="">전체</option>
                 <option value="대기중">대기중</option>
                 <option value="리뷰완료">리뷰완료</option>
               </select>
             </div>
             <div className="flex flex-col gap-0.5">
-              <label className="text-[11px] text-gray-400">구매처</label>
+              <label className="text-[11px] text-gray-400 dark:text-gray-500">구매처</label>
               <select value={filter.platform} onChange={e => set('platform', e.target.value)}
-                className="border border-gray-200 rounded-md px-2.5 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-gray-900 w-28">
+                className="border border-gray-200 dark:border-gray-600 rounded-md px-2.5 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-gray-900 dark:bg-gray-700 dark:text-gray-100 w-28">
                 <option value="">전체</option>
                 {platforms.map(p => <option key={p} value={p}>{p}</option>)}
               </select>
             </div>
             <div className="flex flex-col gap-0.5">
-              <label className="text-[11px] text-gray-400">키워드</label>
+              <label className="text-[11px] text-gray-400 dark:text-gray-500">키워드</label>
               <select value={filter.keyword} onChange={e => set('keyword', e.target.value)}
-                className="border border-gray-200 rounded-md px-2.5 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-gray-900 w-36">
+                className="border border-gray-200 dark:border-gray-600 rounded-md px-2.5 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-gray-900 dark:bg-gray-700 dark:text-gray-100 w-36">
                 <option value="">전체</option>
                 {keywords.map(k => <option key={k} value={k}>{k}</option>)}
               </select>
             </div>
             <div className="flex flex-col gap-0.5">
-              <label className="text-[11px] text-gray-400">시작일</label>
+              <label className="text-[11px] text-gray-400 dark:text-gray-500">시작일</label>
               <input type="date" value={filter.date_from} onChange={e => set('date_from', e.target.value)}
-                className="border border-gray-200 rounded-md px-2.5 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-gray-900" />
+                className="border border-gray-200 dark:border-gray-600 rounded-md px-2.5 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-gray-900 dark:bg-gray-700 dark:text-gray-100" />
             </div>
             <div className="flex flex-col gap-0.5">
-              <label className="text-[11px] text-gray-400">종료일</label>
+              <label className="text-[11px] text-gray-400 dark:text-gray-500">종료일</label>
               <input type="date" value={filter.date_to} onChange={e => set('date_to', e.target.value)}
-                className="border border-gray-200 rounded-md px-2.5 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-gray-900" />
+                className="border border-gray-200 dark:border-gray-600 rounded-md px-2.5 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-gray-900 dark:bg-gray-700 dark:text-gray-100" />
             </div>
             <div className="flex items-end gap-1.5">
               <button onClick={handleSearch}
@@ -221,7 +221,7 @@ export default function RequestsPage() {
                 조회
               </button>
               <button onClick={handleReset}
-                className="px-3 py-1.5 border border-gray-200 text-gray-600 rounded-md text-xs font-semibold hover:bg-gray-50 transition-colors">
+                className="px-3 py-1.5 border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 rounded-md text-xs font-semibold hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                 초기화
               </button>
             </div>
@@ -231,7 +231,7 @@ export default function RequestsPage() {
         {/* 요약 + 엑셀 다운로드 */}
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
-            <span className="text-xs text-gray-500">총 <b className="text-gray-900">{requests.length}</b>건</span>
+            <span className="text-xs text-gray-500 dark:text-gray-400">총 <b className="text-gray-900 dark:text-gray-100">{requests.length}</b>건</span>
             <span className="px-1.5 py-0.5 bg-gray-800 text-white text-[11px] font-bold rounded">대기중 {pending}</span>
             <span className="px-1.5 py-0.5 bg-red-600 text-white text-[11px] font-bold rounded">리뷰완료 {done}</span>
           </div>
@@ -260,7 +260,7 @@ export default function RequestsPage() {
         </div>
 
         {/* 테이블 */}
-        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-xs whitespace-nowrap border-collapse">
               <thead>
@@ -280,16 +280,16 @@ export default function RequestsPage() {
               </thead>
               <tbody>
                 {loading ? (
-                  <tr><td colSpan={19} className="text-center py-10 text-gray-400 text-sm">로딩 중...</td></tr>
+                  <tr><td colSpan={19} className="text-center py-10 text-gray-400 dark:text-gray-500 text-sm">로딩 중...</td></tr>
                 ) : requests.length === 0 ? (
-                  <tr><td colSpan={19} className="text-center py-10 text-gray-400 text-sm">결과가 없습니다.</td></tr>
+                  <tr><td colSpan={19} className="text-center py-10 text-gray-400 dark:text-gray-500 text-sm">결과가 없습니다.</td></tr>
                 ) : paged.map((r) => (
                   <>
                     <tr
                       key={r.id}
                       onClick={() => setExpandedId(expandedId === r.id ? null : r.id)}
-                      className={`cursor-pointer border-b border-gray-100 transition-colors ${
-                        selectedIds.has(r.id) ? 'bg-red-50' : expandedId === r.id ? 'bg-blue-50' : 'hover:bg-gray-50'
+                      className={`cursor-pointer border-b border-gray-100 dark:border-gray-700 transition-colors ${
+                        selectedIds.has(r.id) ? 'bg-red-50 dark:bg-red-900/20' : expandedId === r.id ? 'bg-blue-50 dark:bg-blue-900/20' : 'hover:bg-gray-50 dark:hover:bg-gray-700'
                       }`}
                     >
                       {/* 체크박스 */}
@@ -364,7 +364,7 @@ export default function RequestsPage() {
 
                     {/* 펼침: 이미지 상세 */}
                     {expandedId === r.id && (
-                      <tr key={`d-${r.id}`} className="bg-blue-50 border-b border-blue-100">
+                      <tr key={`d-${r.id}`} className="bg-blue-50 dark:bg-blue-900/20 border-b border-blue-100 dark:border-blue-800">
                         <td colSpan={19} className="px-5 py-3">
                           <div className="flex flex-wrap items-start gap-6">
                             <div className="flex gap-3">
@@ -407,12 +407,12 @@ export default function RequestsPage() {
             <button
               onClick={() => { setPage(1); setExpandedId(null) }}
               disabled={page === 1}
-              className="px-2 py-1 rounded text-xs border border-gray-200 text-gray-500 hover:bg-gray-100 disabled:opacity-30 transition-colors"
+              className="px-2 py-1 rounded text-xs border border-gray-200 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-30 transition-colors"
             >«</button>
             <button
               onClick={() => { setPage(p => Math.max(1, p - 1)); setExpandedId(null) }}
               disabled={page === 1}
-              className="px-2 py-1 rounded text-xs border border-gray-200 text-gray-500 hover:bg-gray-100 disabled:opacity-30 transition-colors"
+              className="px-2 py-1 rounded text-xs border border-gray-200 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-30 transition-colors"
             >‹</button>
 
             {Array.from({ length: totalPages }, (_, i) => i + 1)
@@ -424,14 +424,14 @@ export default function RequestsPage() {
               }, [])
               .map((p, i) =>
                 p === '...'
-                  ? <span key={`e${i}`} className="px-1.5 text-xs text-gray-400">…</span>
+                  ? <span key={`e${i}`} className="px-1.5 text-xs text-gray-400 dark:text-gray-500">…</span>
                   : <button
                       key={p}
                       onClick={() => { setPage(p as number); setExpandedId(null) }}
                       className={`min-w-[28px] px-2 py-1 rounded text-xs border transition-colors ${
                         page === p
                           ? 'bg-gray-900 text-white border-gray-900 font-bold'
-                          : 'border-gray-200 text-gray-600 hover:bg-gray-100'
+                          : 'border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
                       }`}
                     >{p}</button>
               )}
@@ -439,14 +439,14 @@ export default function RequestsPage() {
             <button
               onClick={() => { setPage(p => Math.min(totalPages, p + 1)); setExpandedId(null) }}
               disabled={page === totalPages}
-              className="px-2 py-1 rounded text-xs border border-gray-200 text-gray-500 hover:bg-gray-100 disabled:opacity-30 transition-colors"
+              className="px-2 py-1 rounded text-xs border border-gray-200 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-30 transition-colors"
             >›</button>
             <button
               onClick={() => { setPage(totalPages); setExpandedId(null) }}
               disabled={page === totalPages}
-              className="px-2 py-1 rounded text-xs border border-gray-200 text-gray-500 hover:bg-gray-100 disabled:opacity-30 transition-colors"
+              className="px-2 py-1 rounded text-xs border border-gray-200 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-30 transition-colors"
             >»</button>
-            <span className="ml-2 text-xs text-gray-400">{page} / {totalPages} 페이지</span>
+            <span className="ml-2 text-xs text-gray-400 dark:text-gray-500">{page} / {totalPages} 페이지</span>
           </div>
         )}
       </div>

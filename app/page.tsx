@@ -177,7 +177,7 @@ export default function RequestPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors">
       <GNBHeader />
 
       <div className="max-w-2xl mx-auto p-4 pb-10">
@@ -188,8 +188,8 @@ export default function RequestPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
               </svg>
             </div>
-            <h2 className="text-lg font-bold text-gray-900 mb-2">구매 신청이 완료되었습니다</h2>
-            <p className="text-sm text-gray-500 mb-8">신청 내역은 관리자에게 전달되었습니다.</p>
+            <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2">구매 신청이 완료되었습니다</h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-8">신청 내역은 관리자에게 전달되었습니다.</p>
             <button
               onClick={handleReset}
               className="px-8 py-3 bg-gray-900 text-white rounded-xl font-semibold text-sm hover:bg-gray-700 transition-colors"
@@ -200,16 +200,16 @@ export default function RequestPage() {
         ) : (
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* 상품 정보 */}
-          <div className="bg-white rounded-xl p-4 shadow-sm space-y-3">
-            <h2 className="text-sm font-bold text-gray-700 mb-2">상품 정보</h2>
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm space-y-3">
+            <h2 className="text-sm font-bold text-gray-700 dark:text-gray-200 mb-2">상품 정보</h2>
 
             {/* 요청자 */}
             <div className="flex items-center gap-3">
-              <label className="w-20 text-sm text-gray-600 shrink-0">요청자</label>
+              <label className="w-20 text-sm text-gray-600 dark:text-gray-400 shrink-0">요청자</label>
               <select
                 value={requester}
                 onChange={e => setRequester(e.target.value)}
-                className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900"
+                className="flex-1 border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-400"
               >
                 <option value="">선택</option>
                 {requesters.map(r => <option key={r} value={r}>{r}</option>)}
@@ -218,12 +218,12 @@ export default function RequestPage() {
 
             {/* 구매처 */}
             <div className="flex items-center gap-3">
-              <label className="w-20 text-sm text-gray-600 shrink-0">구매처</label>
+              <label className="w-20 text-sm text-gray-600 dark:text-gray-400 shrink-0">구매처</label>
               <select
                 value={platform}
                 onChange={e => setPlatform(e.target.value)}
                 disabled={!requester}
-                className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 disabled:bg-gray-50 disabled:text-gray-400"
+                className="flex-1 border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 dark:bg-gray-700 dark:text-gray-100 disabled:bg-gray-50 dark:disabled:bg-gray-800 disabled:text-gray-400"
               >
                 <option value="">선택</option>
                 {filteredPlatforms.map(p => <option key={p} value={p}>{p}</option>)}
@@ -232,12 +232,12 @@ export default function RequestPage() {
 
             {/* 키워드 */}
             <div className="flex items-center gap-3">
-              <label className="w-20 text-sm text-gray-600 shrink-0">키워드</label>
+              <label className="w-20 text-sm text-gray-600 dark:text-gray-400 shrink-0">키워드</label>
               <select
                 value={keyword}
                 onChange={e => setKeyword(e.target.value)}
                 disabled={!platform}
-                className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 disabled:bg-gray-50 disabled:text-gray-400"
+                className="flex-1 border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 dark:bg-gray-700 dark:text-gray-100 disabled:bg-gray-50 dark:disabled:bg-gray-800 disabled:text-gray-400"
               >
                 <option value="">선택</option>
                 {filteredKeywords.map(k => <option key={k} value={k}>{k}</option>)}
@@ -246,12 +246,12 @@ export default function RequestPage() {
 
             {/* 구매옵션 */}
             <div className="flex items-center gap-3">
-              <label className="w-20 text-sm text-gray-600 shrink-0">구매옵션</label>
+              <label className="w-20 text-sm text-gray-600 dark:text-gray-400 shrink-0">구매옵션</label>
               <select
                 value={option}
                 onChange={e => setOption(e.target.value)}
                 disabled={!keyword}
-                className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 disabled:bg-gray-50 disabled:text-gray-400"
+                className="flex-1 border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 dark:bg-gray-700 dark:text-gray-100 disabled:bg-gray-50 dark:disabled:bg-gray-800 disabled:text-gray-400"
               >
                 <option value="">선택</option>
                 {filteredOptions.map(o => <option key={o} value={o}>{o}</option>)}
@@ -260,19 +260,19 @@ export default function RequestPage() {
 
             {option && (productPrice !== null || reviewCost !== null) && (
               <div className="flex items-center gap-3 pt-1 border-t border-gray-100">
-                <span className="w-20 text-sm text-gray-600 shrink-0">상품 정보</span>
+                <span className="w-20 text-sm text-gray-600 dark:text-gray-400 shrink-0">상품 정보</span>
                 <div className="flex items-center gap-2 flex-wrap">
                   {productPrice !== null && (
-                    <span className="text-sm text-gray-600">
-                      상품가 <span className="font-bold text-gray-900">{productPrice.toLocaleString()}원</span>
+                    <span className="text-sm text-gray-600 dark:text-gray-400">
+                      상품가 <span className="font-bold text-gray-900 dark:text-white">{productPrice.toLocaleString()}원</span>
                     </span>
                   )}
                   {productPrice !== null && reviewCost !== null && (
                     <span className="text-gray-300">|</span>
                   )}
                   {reviewCost !== null && (
-                    <span className="text-sm text-gray-600">
-                      리뷰비용 <span className="font-bold text-gray-900">{reviewCost.toLocaleString()}원</span>
+                    <span className="text-sm text-gray-600 dark:text-gray-400">
+                      리뷰비용 <span className="font-bold text-gray-900 dark:text-white">{reviewCost.toLocaleString()}원</span>
                     </span>
                   )}
                   {reviewType && (
@@ -286,8 +286,8 @@ export default function RequestPage() {
           </div>
 
           {/* 주문 정보 */}
-          <div className="bg-white rounded-xl p-4 shadow-sm space-y-3">
-            <h2 className="text-sm font-bold text-gray-700 mb-2">주문 정보</h2>
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm space-y-3">
+            <h2 className="text-sm font-bold text-gray-700 dark:text-gray-200 mb-2">주문 정보</h2>
 
             {([
               { label: '주문번호', value: orderNumber, setter: setOrderNumber, placeholder: '주문번호 입력' },
@@ -300,20 +300,20 @@ export default function RequestPage() {
               { label: '예금주', value: depositor, setter: setDepositor, placeholder: '예금주 이름' },
             ] as const).map(({ label, value, setter, placeholder }) => (
               <div key={label} className="flex items-center gap-3">
-                <label className="w-20 text-sm text-gray-600 shrink-0">{label}</label>
+                <label className="w-20 text-sm text-gray-600 dark:text-gray-400 shrink-0">{label}</label>
                 <input
                   type="text"
                   value={value}
                   onChange={e => (setter as (v: string) => void)(e.target.value)}
                   placeholder={placeholder}
-                  className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900"
+                  className="flex-1 border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-400"
                 />
               </div>
             ))}
           </div>
 
           {/* 이미지 업로드 */}
-          <div className="bg-white rounded-xl p-4 shadow-sm">
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm">
             <h2 className="text-sm font-bold text-gray-700 mb-1">구매 인증 이미지 <span className="font-normal text-gray-400">(최대 2장)</span></h2>
             <p className="text-xs text-gray-400 mb-3">파일 선택 또는 Ctrl+V 붙여넣기</p>
             <div className="flex gap-3 flex-wrap">
@@ -331,7 +331,7 @@ export default function RequestPage() {
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="w-24 h-24 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center text-gray-400 hover:border-gray-500 hover:text-gray-600 transition-colors"
+                  className="w-24 h-24 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg flex flex-col items-center justify-center text-gray-400 dark:text-gray-500 hover:border-gray-500 hover:text-gray-600 transition-colors"
                 >
                   <span className="text-3xl leading-none">+</span>
                   <span className="text-xs mt-1">추가</span>

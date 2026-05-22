@@ -98,9 +98,9 @@ export default async function DashboardPage() {
   ]
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors">
       <AdminNav />
-      <div className="max-w-6xl mx-auto px-4 py-6 space-y-6">
+      <div className="max-w-6xl mx-auto px-4 py-6 space-y-6 transition-colors">
 
         {/* 상단 통계 카드 */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
@@ -116,13 +116,13 @@ export default async function DashboardPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           {/* 차트 */}
           <div className="lg:col-span-2 bg-white rounded-xl shadow-sm p-4">
-            <h2 className="text-sm font-bold text-gray-800 mb-4">일별 신청 추이 (최근 14일)</h2>
+            <h2 className="text-sm font-bold text-gray-800 dark:text-gray-100 mb-4">일별 신청 추이 (최근 14일)</h2>
             <DashboardChart data={chartData} />
           </div>
 
           {/* 요청자별 통계 */}
-          <div className="bg-white rounded-xl shadow-sm p-4">
-            <h2 className="text-sm font-bold text-gray-800 mb-3">요청자별 통계</h2>
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
+            <h2 className="text-sm font-bold text-gray-800 dark:text-gray-100 mb-3">요청자별 통계</h2>
             {(requesterRows as { requester: string; total: number; pending: number; done: number; cost_sum: number }[]).length === 0 ? (
               <p className="text-xs text-gray-400 py-4 text-center">데이터 없음</p>
             ) : (
@@ -154,8 +154,8 @@ export default async function DashboardPage() {
 
         {/* 구매처 TOP5 + 키워드 TOP5 */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="bg-white rounded-xl shadow-sm p-4">
-            <h2 className="text-sm font-bold text-gray-800 mb-3">구매처 TOP 5</h2>
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
+            <h2 className="text-sm font-bold text-gray-800 dark:text-gray-100 mb-3">구매처 TOP 5</h2>
             {(platformRows as { platform: string; total: number }[]).map((r, i) => {
               const max = Number((platformRows as { platform: string; total: number }[])[0]?.total ?? 1)
               return (
@@ -175,8 +175,8 @@ export default async function DashboardPage() {
             })}
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm p-4">
-            <h2 className="text-sm font-bold text-gray-800 mb-3">키워드 TOP 5</h2>
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
+            <h2 className="text-sm font-bold text-gray-800 dark:text-gray-100 mb-3">키워드 TOP 5</h2>
             {(keywordRows as { keyword: string; total: number }[]).map((r, i) => {
               const max = Number((keywordRows as { keyword: string; total: number }[])[0]?.total ?? 1)
               return (
@@ -198,8 +198,8 @@ export default async function DashboardPage() {
         </div>
 
         {/* 최근 신청 */}
-        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-gray-700">
             <h2 className="text-sm font-bold text-gray-800">최근 신청</h2>
             <Link href="/admin/requests" className="text-xs text-gray-500 hover:text-gray-900 transition-colors">
               전체 보기 →
@@ -207,7 +207,7 @@ export default async function DashboardPage() {
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-gray-50 text-xs text-gray-500">
+              <thead className="bg-gray-50 dark:bg-gray-700 text-xs text-gray-500 dark:text-gray-400">
                 <tr>
                   <th className="text-left px-3 py-2 font-medium whitespace-nowrap">일시</th>
                   <th className="text-left px-3 py-2 font-medium">요청자</th>
@@ -220,13 +220,13 @@ export default async function DashboardPage() {
                   <th className="text-center px-3 py-2 font-medium">상태</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-50">
+              <tbody className="divide-y divide-gray-50 dark:divide-gray-700">
                 {(recent as { id: number; created_at: string; requester: string; platform: string; keyword: string; option: string; product_price: number; review_cost: number; depositor: string; status: string; review_type: string }[]).length === 0 ? (
                   <tr>
                     <td colSpan={9} className="text-center text-gray-400 py-8 text-sm">신청 내역이 없습니다.</td>
                   </tr>
                 ) : (recent as { id: number; created_at: string; requester: string; platform: string; keyword: string; option: string; product_price: number; review_cost: number; depositor: string; status: string; review_type: string }[]).map(r => (
-                  <tr key={r.id} className="hover:bg-gray-50 transition-colors">
+                  <tr key={r.id} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                     <td className="px-3 py-2.5 text-xs text-gray-500 whitespace-nowrap">{fmt(r.created_at)}</td>
                     <td className="px-3 py-2.5 text-xs text-gray-600">{r.requester || '-'}</td>
                     <td className="px-3 py-2.5 font-medium text-gray-900 whitespace-nowrap">{r.depositor}</td>

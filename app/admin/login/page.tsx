@@ -34,37 +34,37 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 flex items-center justify-center px-4">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-8">
-        <h1 className="text-xl font-bold text-gray-900 mb-1">관리자 로그인</h1>
-        <p className="text-sm text-gray-400 mb-6">쿠팡 리뷰 관리 시스템</p>
+    <div className="min-h-screen bg-gray-900 dark:bg-gray-950 flex items-center justify-center px-4 transition-colors">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-sm p-8">
+        <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-1">관리자 로그인</h1>
+        <p className="text-sm text-gray-400 dark:text-gray-500 mb-6">쿠팡 리뷰 관리 시스템</p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">아이디</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">아이디</label>
             <input
               type="text"
               value={username}
               onChange={e => setUsername(e.target.value)}
               autoComplete="username"
               required
-              className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900"
+              className="w-full border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 dark:bg-gray-700 dark:text-gray-100"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">비밀번호</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">비밀번호</label>
             <input
               type="password"
               value={password}
               onChange={e => setPassword(e.target.value)}
               autoComplete="current-password"
               required
-              className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900"
+              className="w-full border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 dark:bg-gray-700 dark:text-gray-100"
             />
           </div>
 
           {error && (
-            <p className="text-sm text-red-600 bg-red-50 border border-red-100 rounded-lg px-3 py-2">
+            <p className="text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800 rounded-lg px-3 py-2">
               {error}
             </p>
           )}

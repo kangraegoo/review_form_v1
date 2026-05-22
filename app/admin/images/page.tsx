@@ -94,22 +94,22 @@ export default function ImagesPage() {
   const allSelected = images.length > 0 && selectedUrls.size === images.length
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors">
       <AdminNav />
       <div className="max-w-6xl mx-auto px-4 py-6">
 
         {/* 헤더 */}
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
-            <h1 className="text-xl font-bold text-gray-900">이미지 갤러리</h1>
-            {!loading && <span className="text-sm text-gray-500">총 {images.length}장</span>}
+            <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">이미지 갤러리</h1>
+            {!loading && <span className="text-sm text-gray-500 dark:text-gray-400">총 {images.length}장</span>}
           </div>
           <div className="flex items-center gap-2">
             {selectMode && (
               <>
                 <button
                   onClick={toggleSelectAll}
-                  className="px-3 py-1.5 border border-gray-300 rounded-lg text-xs font-semibold text-gray-600 hover:bg-gray-50 transition-colors"
+                  className="px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg text-xs font-semibold text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                 >
                   {allSelected ? '전체 해제' : '전체 선택'}
                 </button>
@@ -125,7 +125,7 @@ export default function ImagesPage() {
                 </button>
                 <button
                   onClick={() => { setSelectMode(false); setSelectedUrls(new Set()) }}
-                  className="px-3 py-1.5 border border-gray-300 rounded-lg text-xs font-semibold text-gray-500 hover:bg-gray-50 transition-colors"
+                  className="px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg text-xs font-semibold text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                 >
                   취소
                 </button>
@@ -135,7 +135,7 @@ export default function ImagesPage() {
               <button
                 onClick={() => setSelectMode(true)}
                 disabled={images.length === 0}
-                className="px-3 py-1.5 border border-gray-300 rounded-lg text-xs font-semibold text-gray-600 hover:bg-gray-50 transition-colors disabled:opacity-30"
+                className="px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg text-xs font-semibold text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-30"
               >
                 선택 삭제
               </button>
@@ -145,16 +145,16 @@ export default function ImagesPage() {
 
         {/* 선택 현황 바 */}
         {selectMode && selectedUrls.size > 0 && (
-          <div className="mb-3 px-3 py-2 bg-red-50 border border-red-200 rounded-lg text-xs text-red-700 font-medium">
+          <div className="mb-3 px-3 py-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-xs text-red-700 dark:text-red-400 font-medium">
             {selectedUrls.size}장 선택됨
           </div>
         )}
 
         {/* 갤러리 */}
         {loading ? (
-          <div className="text-center text-gray-400 py-20 text-sm">로딩 중...</div>
+          <div className="text-center text-gray-400 dark:text-gray-500 py-20 text-sm">로딩 중...</div>
         ) : images.length === 0 ? (
-          <div className="text-center text-gray-400 py-20">업로드된 이미지가 없습니다.</div>
+          <div className="text-center text-gray-400 dark:text-gray-500 py-20">업로드된 이미지가 없습니다.</div>
         ) : (
           <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
             {images.map((img, i) => {

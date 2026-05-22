@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import ThemeToggle from '@/components/ThemeToggle'
 
 const NAV = [
   { href: '/admin', label: '대시보드', exact: true },
@@ -58,6 +59,7 @@ export default function AdminNav() {
               {me.role === 'super' && <span className="ml-1 text-[10px] px-1 py-0.5 bg-gray-700 rounded">Super</span>}
             </span>
           )}
+          <ThemeToggle variant="dark" />
           <button
             onClick={handleLogout}
             className="text-xs text-gray-400 hover:text-white transition-colors"
