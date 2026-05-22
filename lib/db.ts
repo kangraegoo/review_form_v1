@@ -1,4 +1,5 @@
 import { neon } from '@neondatabase/serverless'
+import bcrypt from 'bcryptjs'
 
 export const sql = neon(process.env.DATABASE_URL!)
 
@@ -45,4 +46,22 @@ export async function initDB() {
   `
   await sql`ALTER TABLE purchase_requests ADD COLUMN IF NOT EXISTS requester TEXT DEFAULT ''`
   await sql`ALTER TABLE purchase_requests ADD COLUMN IF NOT EXISTS product_price INTEGER`
+
+  await sql`
+    CREATE TABLE IF NOT EXISTS admin_users (
+      id SERIAL PRIMARY KEY,
+      username TEXT UNIQUE NOT NULL,
+      display_name TEXT NOT NULL DEFAULT '',
+      password_hash TEXT NOT NULL,
+      role TEXT NOT NULL DEFAULT 'admin',
+      is_active BOOLEAN DEFAULT TRUE,
+      created_at TIMESTAMP DEFAULT NOW()
+    )
+  `
+  const defaultHash = await bcrypt.hash('admin1234', 10)
+  await sql`
+    INSERT INTO admin_users (username, display_name, password_hash, role)
+    SELECT 'admin', '관리자', ${defaultHash}, 'super'
+    WHERE NOT EXISTS (SELECT 1 FROM admin_users WHERE username = 'admin')
+  `
 }

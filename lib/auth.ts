@@ -4,23 +4,36 @@ import { cookies } from 'next/headers'
 const SECRET = new TextEncoder().encode(process.env.AUTH_SECRET!)
 const COOKIE_NAME = 'admin-token'
 
-export async function signToken() {
-  return new SignJWT({ role: 'admin' })
+export type SessionUser = {
+  id: number
+  username: string
+  name: string
+  role: string
+}
+
+export async function signToken(user: SessionUser) {
+  return new SignJWT({ id: user.id, username: user.username, name: user.name, role: user.role })
     .setProtectedHeader({ alg: 'HS256' })
     .setExpirationTime('8h')
     .sign(SECRET)
 }
 
-export async function verifyToken(token: string) {
+export async function verifyToken(token: string): Promise<SessionUser | null> {
   try {
     const { payload } = await jwtVerify(token, SECRET)
-    return payload
+    if (!payload.id || !payload.username) return null
+    return {
+      id: payload.id as number,
+      username: payload.username as string,
+      name: payload.name as string,
+      role: payload.role as string,
+    }
   } catch {
     return null
   }
 }
 
-export async function getSession() {
+export async function getSession(): Promise<SessionUser | null> {
   const cookieStore = await cookies()
   const token = cookieStore.get(COOKIE_NAME)?.value
   if (!token) return null
@@ -33,7 +46,7 @@ export async function setSessionCookie(token: string) {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
-    maxAge: 60 * 60 * 8, // 8시간
+    maxAge: 60 * 60 * 8,
     path: '/',
   })
 }
