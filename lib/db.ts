@@ -48,6 +48,22 @@ export async function initDB() {
   await sql`ALTER TABLE purchase_requests ADD COLUMN IF NOT EXISTS product_price INTEGER`
 
   await sql`
+    CREATE TABLE IF NOT EXISTS notices (
+      id SERIAL PRIMARY KEY,
+      type TEXT NOT NULL DEFAULT '공지',
+      title TEXT NOT NULL,
+      content TEXT NOT NULL DEFAULT '',
+      author TEXT NOT NULL DEFAULT '',
+      is_active BOOLEAN DEFAULT TRUE,
+      start_at DATE,
+      end_at DATE,
+      sort_order INTEGER DEFAULT 0,
+      created_at TIMESTAMP DEFAULT NOW()
+    )
+  `
+  await sql`ALTER TABLE notices ADD COLUMN IF NOT EXISTS author TEXT NOT NULL DEFAULT ''`
+
+  await sql`
     CREATE TABLE IF NOT EXISTS admin_users (
       id SERIAL PRIMARY KEY,
       username TEXT UNIQUE NOT NULL,

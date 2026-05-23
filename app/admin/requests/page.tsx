@@ -1,7 +1,6 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
-import * as XLSX from 'xlsx'
 import AdminNav from '@/components/admin/AdminNav'
 
 type Request = {
@@ -124,32 +123,14 @@ export default function RequestsPage() {
   }
 
   function downloadExcel() {
-    const data = requests.map(r => ({
-      '제출일시':   fmt(r.created_at),
-      '상태':       r.status,
-      '요청자':     r.requester  || '',
-      '구매처':     r.platform   || '',
-      '키워드':     r.keyword    || '',
-      '구매옵션':   r.option     || '',
-      '상품가':     r.product_price ?? '',
-      '리뷰비용':   r.review_cost ?? '',
-      '주문번호':   r.order_number || '',
-      '구매자':     r.buyer      || '',
-      '수취인':     r.recipient  || '',
-      '전화번호':   r.phone      || '',
-      '주소':       r.address    || '',
-      '은행명':     r.bank       || '',
-      '계좌번호':   r.account    || '',
-      '예금주':     r.depositor  || '',
-      '구매이미지1': r.image1_url || '',
-      '구매이미지2': r.image2_url || '',
-      '리뷰이미지':  r.review_image_url || '',
-    }))
-    const ws = XLSX.utils.json_to_sheet(data)
-    const wb = XLSX.utils.book_new()
-    XLSX.utils.book_append_sheet(wb, ws, '구매신청목록')
-    const filename = `구매신청목록_${today()}.xlsx`
-    XLSX.writeFile(wb, filename)
+    const params = new URLSearchParams()
+    if (filter.status)    params.set('status',    filter.status)
+    if (filter.search)    params.set('search',    filter.search)
+    if (filter.platform)  params.set('platform',  filter.platform)
+    if (filter.keyword)   params.set('keyword',   filter.keyword)
+    if (filter.date_from) params.set('date_from', filter.date_from)
+    if (filter.date_to)   params.set('date_to',   filter.date_to)
+    window.location.href = `/api/export?${params}`
   }
 
   const pending    = requests.filter(r => r.status === '대기중').length

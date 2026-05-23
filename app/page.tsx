@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import GNBHeader from '@/components/GNBHeader'
+import NoticeBanner from '@/components/NoticeBanner'
 
 type KeywordRow = {
   id: number
@@ -179,6 +180,7 @@ export default function RequestPage() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors">
       <GNBHeader />
+      <NoticeBanner />
 
       <div className="max-w-2xl mx-auto p-4 pb-10">
         {success ? (

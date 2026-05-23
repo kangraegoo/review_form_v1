@@ -9,6 +9,7 @@ const NAV = [
   { href: '/admin', label: '대시보드', exact: true },
   { href: '/admin/requests', label: '구매신청 목록' },
   { href: '/admin/keywords', label: '키워드 설정' },
+  { href: '/admin/notices', label: '공지 관리' },
   { href: '/admin/images', label: '이미지 갤러리' },
   { href: '/admin/users', label: '계정 관리' },
 ]
@@ -52,9 +53,9 @@ export default function AdminNav() {
             )
           })}
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           {me && (
-            <span className="text-xs text-gray-400">
+            <span className="text-xs text-gray-400 hidden sm:inline">
               {me.name}
               {me.role === 'super' && <span className="ml-1 text-[10px] px-1 py-0.5 bg-gray-700 rounded">Super</span>}
             </span>
