@@ -27,14 +27,7 @@ export default function RequestPage() {
   const [reviewCost, setReviewCost] = useState<number | null>(null)
   const [reviewType, setReviewType] = useState('')
 
-  const [orderNumber, setOrderNumber] = useState('')
-  const [buyer, setBuyer] = useState('')
-  const [recipient, setRecipient] = useState('')
-  const [phone, setPhone] = useState('')
-  const [address, setAddress] = useState('')
-  const [bank, setBank] = useState('')
-  const [account, setAccount] = useState('')
-  const [depositor, setDepositor] = useState('')
+  const [orderInfoRaw, setOrderInfoRaw] = useState('')
 
   const [images, setImages] = useState<ImageFile[]>([])
   const [submitting, setSubmitting] = useState(false)
@@ -138,19 +131,33 @@ export default function RequestPage() {
     return url
   }
 
+  function parseOrderInfo(raw: string) {
+    const parts = raw.split('/').map(s => s.trim())
+    return {
+      orderNumber: parts[0] || '',
+      buyer:       parts[1] || '',
+      recipient:   parts[2] || '',
+      phone:       parts[3] || '',
+      address:     parts[4] || '',
+      bank:        parts[5] || '',
+      account:     parts[6] || '',
+      depositor:   parts[7] || '',
+    }
+  }
+
   function handleReset() {
     setSuccess(false)
     setRequester(''); setPlatform(''); setKeyword(''); setOption('')
     setProductPrice(null); setReviewCost(null); setReviewType('')
-    setOrderNumber(''); setBuyer(''); setRecipient('')
-    setPhone(''); setAddress(''); setBank(''); setAccount(''); setDepositor('')
+    setOrderInfoRaw('')
     setImages([])
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!platform || !keyword || !option) return alert('구매처, 키워드, 구매옵션을 선택해주세요.')
-    if (!depositor) return alert('예금주를 입력해주세요.')
+    const { orderNumber, buyer, recipient, phone, address, bank, account, depositor } = parseOrderInfo(orderInfoRaw)
+    if (!depositor) return alert('예금주를 입력해주세요. (주문번호/구매자/수취인/전화번호/주소/은행명/계좌번호/예금주)')
 
     setSubmitting(true)
     try {
@@ -164,7 +171,7 @@ export default function RequestPage() {
         body: JSON.stringify({
           requester, platform, keyword, option, product_price: productPrice, review_cost: reviewCost,
           order_number: orderNumber, buyer, recipient, phone,
-          address, bank, account, depositor, image1_url, image2_url,
+          address, bank, account, depositor, review_type: reviewType, image1_url, image2_url,
         }),
       })
       if (!res.ok) throw new Error('제출 실패')
@@ -289,29 +296,34 @@ export default function RequestPage() {
 
           {/* 주문 정보 */}
           <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm space-y-3">
-            <h2 className="text-sm font-bold text-gray-700 dark:text-gray-200 mb-2">주문 정보</h2>
-
-            {([
-              { label: '주문번호', value: orderNumber, setter: setOrderNumber, placeholder: '주문번호 입력' },
-              { label: '구매자', value: buyer, setter: setBuyer, placeholder: '구매자 이름' },
-              { label: '수취인', value: recipient, setter: setRecipient, placeholder: '수취인 이름' },
-              { label: '전화번호', value: phone, setter: setPhone, placeholder: '010-0000-0000' },
-              { label: '주소', value: address, setter: setAddress, placeholder: '배송 주소' },
-              { label: '은행명', value: bank, setter: setBank, placeholder: '은행명' },
-              { label: '계좌번호', value: account, setter: setAccount, placeholder: '계좌번호' },
-              { label: '예금주', value: depositor, setter: setDepositor, placeholder: '예금주 이름' },
-            ] as const).map(({ label, value, setter, placeholder }) => (
-              <div key={label} className="flex items-center gap-3">
-                <label className="w-20 text-sm text-gray-600 dark:text-gray-400 shrink-0">{label}</label>
-                <input
-                  type="text"
-                  value={value}
-                  onChange={e => (setter as (v: string) => void)(e.target.value)}
-                  placeholder={placeholder}
-                  className="flex-1 border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-400"
-                />
-              </div>
-            ))}
+            <h2 className="text-sm font-bold text-gray-700 dark:text-gray-200 mb-1">주문 정보</h2>
+            <p className="text-xs text-gray-400 dark:text-gray-500">
+              주문번호 / 구매자 / 수취인 / 전화번호 / 주소 / 은행명 / 계좌번호 / 예금주 순서로 / 구분하여 입력
+            </p>
+            <textarea
+              value={orderInfoRaw}
+              onChange={e => setOrderInfoRaw(e.target.value)}
+              placeholder="예) 111-111-1111/홍길동/홍길순/010-1234-5678/서울시 강남구/국민은행/1234567890/홍길동"
+              rows={3}
+              className="w-full border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-400 resize-none"
+            />
+            {orderInfoRaw && (() => {
+              const p = parseOrderInfo(orderInfoRaw)
+              const labels = ['주문번호', '구매자', '수취인', '전화번호', '주소', '은행명', '계좌번호', '예금주']
+              const values = [p.orderNumber, p.buyer, p.recipient, p.phone, p.address, p.bank, p.account, p.depositor]
+              return (
+                <div className="grid grid-cols-2 gap-x-4 gap-y-1 pt-2 border-t border-gray-100 dark:border-gray-700">
+                  {labels.map((label, i) => (
+                    <div key={label} className="flex items-center gap-2 min-w-0">
+                      <span className="text-xs text-gray-400 dark:text-gray-500 shrink-0">{label}</span>
+                      <span className={`text-xs truncate font-medium ${values[i] ? 'text-gray-800 dark:text-gray-200' : 'text-gray-300 dark:text-gray-600'}`}>
+                        {values[i] || '—'}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )
+            })()}
           </div>
 
           {/* 이미지 업로드 */}

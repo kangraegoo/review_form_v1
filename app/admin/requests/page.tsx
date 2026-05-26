@@ -20,6 +20,7 @@ type Request = {
   bank: string
   account: string
   depositor: string
+  review_type: string
   image1_url: string
   image2_url: string
   status: string
@@ -254,16 +255,16 @@ export default function RequestsPage() {
                       className="w-3.5 h-3.5 accent-white cursor-pointer"
                     />
                   </th>
-                  {['제출일시','상태','요청자','구매처','키워드','구매옵션','상품가','리뷰비용','주문번호','구매자','수취인','전화번호','주소','은행명','계좌번호','예금주','상태변경','이미지'].map(h => (
+                  {['제출일시','상태','요청자','구매처','키워드','구매옵션','상품가','리뷰비용','주문번호','구매자','수취인','전화번호','주소','은행명','계좌번호','예금주','리뷰타입','상태변경','이미지'].map(h => (
                     <th key={h} className={thClass}>{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {loading ? (
-                  <tr><td colSpan={19} className="text-center py-10 text-gray-400 dark:text-gray-500 text-sm">로딩 중...</td></tr>
+                  <tr><td colSpan={20} className="text-center py-10 text-gray-400 dark:text-gray-500 text-sm">로딩 중...</td></tr>
                 ) : requests.length === 0 ? (
-                  <tr><td colSpan={19} className="text-center py-10 text-gray-400 dark:text-gray-500 text-sm">결과가 없습니다.</td></tr>
+                  <tr><td colSpan={20} className="text-center py-10 text-gray-400 dark:text-gray-500 text-sm">결과가 없습니다.</td></tr>
                 ) : paged.map((r) => (
                   <>
                     <tr
@@ -318,6 +319,12 @@ export default function RequestsPage() {
                       <td className={`${tdClass} font-mono text-gray-600`}>{r.account || '-'}</td>
                       {/* 예금주 */}
                       <td className={`${tdClass} font-semibold text-gray-900`}>{r.depositor || '-'}</td>
+                      {/* 리뷰타입 */}
+                      <td className={tdClass}>
+                        {r.review_type ? (
+                          <span className="px-1.5 py-0.5 bg-red-600 text-white text-[11px] font-bold rounded">{r.review_type}</span>
+                        ) : '-'}
+                      </td>
                       {/* 상태변경 */}
                       <td className={tdClass} onClick={e => e.stopPropagation()}>
                         <div className="flex justify-center gap-1">
@@ -346,7 +353,7 @@ export default function RequestsPage() {
                     {/* 펼침: 이미지 상세 */}
                     {expandedId === r.id && (
                       <tr key={`d-${r.id}`} className="bg-blue-50 dark:bg-blue-900/20 border-b border-blue-100 dark:border-blue-800">
-                        <td colSpan={19} className="px-5 py-3">
+                        <td colSpan={20} className="px-5 py-3">
                           <div className="flex flex-wrap items-start gap-6">
                             <div className="flex gap-3">
                               {r.image1_url && (

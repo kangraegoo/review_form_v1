@@ -46,6 +46,7 @@ export async function initDB() {
   `
   await sql`ALTER TABLE purchase_requests ADD COLUMN IF NOT EXISTS requester TEXT DEFAULT ''`
   await sql`ALTER TABLE purchase_requests ADD COLUMN IF NOT EXISTS product_price INTEGER`
+  await sql`ALTER TABLE purchase_requests ADD COLUMN IF NOT EXISTS review_type TEXT DEFAULT ''`
 
   await sql`
     CREATE TABLE IF NOT EXISTS notices (

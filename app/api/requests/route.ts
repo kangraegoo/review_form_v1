@@ -56,11 +56,11 @@ export async function POST(req: Request) {
 
   const [row] = await sql`
     INSERT INTO purchase_requests
-      (requester, platform, keyword, option, review_cost, product_price, order_number, buyer, recipient,
+      (requester, platform, keyword, option, review_cost, product_price, review_type, order_number, buyer, recipient,
        phone, address, bank, account, depositor, image1_url, image2_url)
     VALUES
       (${requester ?? ''}, ${platform}, ${keyword}, ${option}, ${review_cost}, ${product_price ?? null},
-       ${order_number}, ${buyer}, ${recipient},
+       ${body.review_type ?? ''}, ${order_number}, ${buyer}, ${recipient},
        ${phone}, ${address}, ${bank}, ${account}, ${depositor}, ${image1_url}, ${image2_url})
     RETURNING id
   `
