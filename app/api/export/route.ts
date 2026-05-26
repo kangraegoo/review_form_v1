@@ -51,19 +51,19 @@ export async function GET(req: Request) {
     '은행명':      r.bank          ?? '',
     '계좌번호':    r.account       ?? '',
     '예금주':      r.depositor     ?? '',
-    '리뷰타입':    r.review_type   ?? '',
-    '배송확인':    r.note1         ?? '',
-    '리뷰확인':    r.note2         ?? '',
-    '특이사항':    r.note3         ?? '',
-    '구매이미지1': r.image1_url    ?? '',
-    '구매이미지2': r.image2_url    ?? '',
+    '리뷰타입':    r.review_type      ?? '',
+    '구매이미지1': r.image1_url       ?? '',
+    '구매이미지2': r.image2_url       ?? '',
     '리뷰이미지':  r.review_image_url ?? '',
+    '배송확인':    r.note1            ?? '',
+    '리뷰확인':    r.note2            ?? '',
+    '특이사항':    r.note3            ?? '',
   }))
 
   const headers = [
     '제출일시','상태','요청자','구매처','키워드','구매옵션','상품가','리뷰비용',
     '주문번호','구매자','수취인','전화번호','주소','은행명','계좌번호','예금주',
-    '리뷰타입','배송확인','리뷰확인','특이사항','구매이미지1','구매이미지2','리뷰이미지',
+    '리뷰타입','구매이미지1','구매이미지2','리뷰이미지','배송확인','리뷰확인','특이사항',
   ]
   const ws = XLSX.utils.json_to_sheet(data, { header: headers })
   const wb = XLSX.utils.book_new()
