@@ -71,8 +71,18 @@ export async function PATCH(req: Request) {
   const session = await getSession()
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const { id, status } = await req.json()
-  await sql`UPDATE purchase_requests SET status=${status} WHERE id=${id}`
+  const body = await req.json()
+  const { id } = body
+
+  if (body.status !== undefined) {
+    await sql`UPDATE purchase_requests SET status=${body.status} WHERE id=${id}`
+  } else if (body.field && ['note1', 'note2', 'note3'].includes(body.field)) {
+    const value = body.value ?? ''
+    if (body.field === 'note1') await sql`UPDATE purchase_requests SET note1=${value} WHERE id=${id}`
+    if (body.field === 'note2') await sql`UPDATE purchase_requests SET note2=${value} WHERE id=${id}`
+    if (body.field === 'note3') await sql`UPDATE purchase_requests SET note3=${value} WHERE id=${id}`
+  }
+
   return NextResponse.json({ ok: true })
 }
 

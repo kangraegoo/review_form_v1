@@ -21,6 +21,9 @@ type Request = {
   account: string
   depositor: string
   review_type: string
+  note1: string
+  note2: string
+  note3: string
   image1_url: string
   image2_url: string
   status: string
@@ -41,6 +44,7 @@ export default function RequestsPage() {
   const [page, setPage] = useState(1)
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set())
   const [deleting, setDeleting] = useState(false)
+  const [editingNote, setEditingNote] = useState<{ id: number; field: 'note1'|'note2'|'note3'; value: string } | null>(null)
 
   const load = useCallback(async (f: typeof EMPTY_FILTER) => {
     setLoading(true)
@@ -107,6 +111,18 @@ export default function RequestsPage() {
     } finally {
       setDeleting(false)
     }
+  }
+
+  async function saveNote() {
+    if (!editingNote) return
+    const { id, field, value } = editingNote
+    setEditingNote(null)
+    setRequests(prev => prev.map(r => r.id === id ? { ...r, [field]: value } : r))
+    await fetch('/api/requests', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, field, value }),
+    })
   }
 
   async function changeStatus(id: number, status: string) {
@@ -255,16 +271,16 @@ export default function RequestsPage() {
                       className="w-3.5 h-3.5 accent-white cursor-pointer"
                     />
                   </th>
-                  {['제출일시','상태','요청자','구매처','키워드','구매옵션','상품가','리뷰비용','주문번호','구매자','수취인','전화번호','주소','은행명','계좌번호','예금주','리뷰타입','상태변경','이미지'].map(h => (
+                  {['제출일시','상태','요청자','구매처','키워드','구매옵션','상품가','리뷰비용','주문번호','구매자','수취인','전화번호','주소','은행명','계좌번호','예금주','리뷰타입','상태변경','이미지','배송확인','리뷰확인','특이사항'].map(h => (
                     <th key={h} className={thClass}>{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {loading ? (
-                  <tr><td colSpan={20} className="text-center py-10 text-gray-400 dark:text-gray-500 text-sm">로딩 중...</td></tr>
+                  <tr><td colSpan={23} className="text-center py-10 text-gray-400 dark:text-gray-500 text-sm">로딩 중...</td></tr>
                 ) : requests.length === 0 ? (
-                  <tr><td colSpan={20} className="text-center py-10 text-gray-400 dark:text-gray-500 text-sm">결과가 없습니다.</td></tr>
+                  <tr><td colSpan={23} className="text-center py-10 text-gray-400 dark:text-gray-500 text-sm">결과가 없습니다.</td></tr>
                 ) : paged.map((r) => (
                   <>
                     <tr
@@ -348,12 +364,34 @@ export default function RequestsPage() {
                           {r.review_image_url && <a href={r.review_image_url} target="_blank" rel="noreferrer"><img src={r.review_image_url} alt="" className="w-8 h-8 object-cover rounded border-2 border-red-400 hover:opacity-80" /></a>}
                         </div>
                       </td>
+                      {/* 메모 3개 */}
+                      {(['note1','note2','note3'] as const).map(field => (
+                        <td key={field} className={tdClass} onClick={e => e.stopPropagation()}>
+                          {editingNote?.id === r.id && editingNote.field === field ? (
+                            <input
+                              autoFocus
+                              value={editingNote.value}
+                              onChange={e => setEditingNote(prev => prev ? { ...prev, value: e.target.value } : null)}
+                              onBlur={saveNote}
+                              onKeyDown={e => { if (e.key === 'Enter') saveNote(); if (e.key === 'Escape') setEditingNote(null) }}
+                              className="w-24 border border-blue-400 rounded px-1.5 py-0.5 text-xs focus:outline-none dark:bg-gray-700 dark:text-gray-100"
+                            />
+                          ) : (
+                            <span
+                              onClick={() => setEditingNote({ id: r.id, field, value: r[field] || '' })}
+                              className={`block min-w-[80px] min-h-[18px] cursor-text rounded px-1 py-0.5 hover:bg-blue-50 dark:hover:bg-blue-900/30 text-left ${r[field] ? 'text-gray-800 dark:text-gray-200' : 'text-gray-300 dark:text-gray-600'}`}
+                            >
+                              {r[field] || '클릭하여 입력'}
+                            </span>
+                          )}
+                        </td>
+                      ))}
                     </tr>
 
                     {/* 펼침: 이미지 상세 */}
                     {expandedId === r.id && (
                       <tr key={`d-${r.id}`} className="bg-blue-50 dark:bg-blue-900/20 border-b border-blue-100 dark:border-blue-800">
-                        <td colSpan={20} className="px-5 py-3">
+                        <td colSpan={23} className="px-5 py-3">
                           <div className="flex flex-wrap items-start gap-6">
                             <div className="flex gap-3">
                               {r.image1_url && (
