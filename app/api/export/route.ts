@@ -60,7 +60,12 @@ export async function GET(req: Request) {
     '리뷰이미지':  r.review_image_url ?? '',
   }))
 
-  const ws = XLSX.utils.json_to_sheet(data)
+  const headers = [
+    '제출일시','상태','요청자','구매처','키워드','구매옵션','상품가','리뷰비용',
+    '주문번호','구매자','수취인','전화번호','주소','은행명','계좌번호','예금주',
+    '리뷰타입','배송확인','리뷰확인','특이사항','구매이미지1','구매이미지2','리뷰이미지',
+  ]
+  const ws = XLSX.utils.json_to_sheet(data, { header: headers })
   const wb = XLSX.utils.book_new()
   XLSX.utils.book_append_sheet(wb, ws, '구매신청목록')
   const buf: Uint8Array = XLSX.write(wb, { bookType: 'xlsx', type: 'array' })
