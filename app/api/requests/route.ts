@@ -22,6 +22,7 @@ export async function GET(req: Request) {
 
     const status    = searchParams.get('status')    || ''
     const search    = searchParams.get('search')    || ''
+    const requester = searchParams.get('requester') || ''
     const platform  = searchParams.get('platform')  || ''
     const keyword   = searchParams.get('keyword')   || ''
     const dateFrom  = searchParams.get('date_from') || ''
@@ -30,14 +31,15 @@ export async function GET(req: Request) {
     const rows = await sql`
       SELECT * FROM purchase_requests
       WHERE
-        (${status}   = '' OR status   = ${status})
-        AND (${platform} = '' OR platform = ${platform})
-        AND (${keyword}  = '' OR keyword  = ${keyword})
+        (${status}    = '' OR status    = ${status})
+        AND (${requester} = '' OR requester = ${requester})
+        AND (${platform}  = '' OR platform  = ${platform})
+        AND (${keyword}   = '' OR keyword   = ${keyword})
         AND (${search}   = '' OR depositor   ILIKE ${'%' + search + '%'}
                               OR order_number ILIKE ${'%' + search + '%'}
                               OR buyer        ILIKE ${'%' + search + '%'})
-        AND (${dateFrom} = '' OR created_at >= ${dateFrom}::date)
-        AND (${dateTo}   = '' OR created_at <  (${dateTo}::date + interval '1 day'))
+        AND (${dateFrom} = '' OR (created_at + interval '9 hours')::date >= ${dateFrom}::date)
+        AND (${dateTo}   = '' OR (created_at + interval '9 hours')::date <= ${dateTo}::date)
       ORDER BY created_at DESC
     `
     return NextResponse.json(rows)
@@ -76,11 +78,20 @@ export async function PATCH(req: Request) {
 
   if (body.status !== undefined) {
     await sql`UPDATE purchase_requests SET status=${body.status} WHERE id=${id}`
-  } else if (body.field && ['note1', 'note2', 'note3'].includes(body.field)) {
+  } else if (body.field && ['note1','note2','note3','order_number','buyer','recipient','phone','address','bank','account','depositor'].includes(body.field)) {
     const value = body.value ?? ''
-    if (body.field === 'note1') await sql`UPDATE purchase_requests SET note1=${value} WHERE id=${id}`
-    if (body.field === 'note2') await sql`UPDATE purchase_requests SET note2=${value} WHERE id=${id}`
-    if (body.field === 'note3') await sql`UPDATE purchase_requests SET note3=${value} WHERE id=${id}`
+    const f = body.field
+    if (f === 'note1')        await sql`UPDATE purchase_requests SET note1=${value}        WHERE id=${id}`
+    else if (f === 'note2')   await sql`UPDATE purchase_requests SET note2=${value}        WHERE id=${id}`
+    else if (f === 'note3')   await sql`UPDATE purchase_requests SET note3=${value}        WHERE id=${id}`
+    else if (f === 'order_number') await sql`UPDATE purchase_requests SET order_number=${value} WHERE id=${id}`
+    else if (f === 'buyer')   await sql`UPDATE purchase_requests SET buyer=${value}        WHERE id=${id}`
+    else if (f === 'recipient') await sql`UPDATE purchase_requests SET recipient=${value}  WHERE id=${id}`
+    else if (f === 'phone')   await sql`UPDATE purchase_requests SET phone=${value}        WHERE id=${id}`
+    else if (f === 'address') await sql`UPDATE purchase_requests SET address=${value}      WHERE id=${id}`
+    else if (f === 'bank')    await sql`UPDATE purchase_requests SET bank=${value}         WHERE id=${id}`
+    else if (f === 'account') await sql`UPDATE purchase_requests SET account=${value}      WHERE id=${id}`
+    else if (f === 'depositor') await sql`UPDATE purchase_requests SET depositor=${value}  WHERE id=${id}`
   }
 
   return NextResponse.json({ ok: true })

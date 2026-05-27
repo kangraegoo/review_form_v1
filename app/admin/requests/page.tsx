@@ -30,8 +30,8 @@ type Request = {
   review_image_url: string
 }
 
-const today = () => new Date().toISOString().split('T')[0]
-const EMPTY_FILTER = { search: '', status: '', platform: '', keyword: '', date_from: today(), date_to: today() }
+const today = () => new Date(Date.now() + 9 * 60 * 60 * 1000).toISOString().split('T')[0]
+const EMPTY_FILTER = { search: '', status: '', requester: '', platform: '', keyword: '', date_from: today(), date_to: today() }
 const PAGE_SIZE = 30
 
 export default function RequestsPage() {
@@ -39,20 +39,22 @@ export default function RequestsPage() {
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState(EMPTY_FILTER)
   const [expandedId, setExpandedId] = useState<number | null>(null)
+  const [requesters, setRequesters] = useState<string[]>([])
   const [platforms, setPlatforms] = useState<string[]>([])
   const [keywords, setKeywords] = useState<string[]>([])
   const [page, setPage] = useState(1)
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set())
   const [deleting, setDeleting] = useState(false)
-  const [editingNote, setEditingNote] = useState<{ id: number; field: 'note1'|'note2'|'note3'; value: string } | null>(null)
+  const [editingNote, setEditingNote] = useState<{ id: number; field: 'note1'|'note2'|'note3'|'order_number'|'buyer'|'recipient'|'phone'|'address'|'bank'|'account'|'depositor'; value: string } | null>(null)
 
   const load = useCallback(async (f: typeof EMPTY_FILTER) => {
     setLoading(true)
     const params = new URLSearchParams({ all: '1' })
-    if (f.status)    params.set('status',    f.status)
-    if (f.search)    params.set('search',    f.search)
-    if (f.platform)  params.set('platform',  f.platform)
-    if (f.keyword)   params.set('keyword',   f.keyword)
+    if (f.status)     params.set('status',     f.status)
+    if (f.search)     params.set('search',     f.search)
+    if (f.requester)  params.set('requester',  f.requester)
+    if (f.platform)   params.set('platform',   f.platform)
+    if (f.keyword)    params.set('keyword',    f.keyword)
     if (f.date_from) params.set('date_from', f.date_from)
     if (f.date_to)   params.set('date_to',   f.date_to)
     const res = await fetch(`/api/requests?${params}`)
@@ -62,7 +64,8 @@ export default function RequestsPage() {
 
   useEffect(() => {
     load(EMPTY_FILTER)
-    fetch('/api/keywords').then(r => r.json()).then((rows: { platform: string; keyword: string }[]) => {
+    fetch('/api/keywords').then(r => r.json()).then((rows: { requester: string; platform: string; keyword: string }[]) => {
+      setRequesters([...new Set(rows.map(r => r.requester).filter(Boolean))])
       setPlatforms([...new Set(rows.map(r => r.platform))])
       setKeywords([...new Set(rows.map(r => r.keyword))])
     })
@@ -141,19 +144,22 @@ export default function RequestsPage() {
 
   function downloadExcel() {
     const params = new URLSearchParams()
-    if (filter.status)    params.set('status',    filter.status)
-    if (filter.search)    params.set('search',    filter.search)
-    if (filter.platform)  params.set('platform',  filter.platform)
-    if (filter.keyword)   params.set('keyword',   filter.keyword)
+    if (filter.status)     params.set('status',     filter.status)
+    if (filter.search)     params.set('search',     filter.search)
+    if (filter.requester)  params.set('requester',  filter.requester)
+    if (filter.platform)   params.set('platform',   filter.platform)
+    if (filter.keyword)    params.set('keyword',    filter.keyword)
     if (filter.date_from) params.set('date_from', filter.date_from)
     if (filter.date_to)   params.set('date_to',   filter.date_to)
     window.location.href = `/api/export?${params}`
   }
 
-  const pending    = requests.filter(r => r.status === '대기중').length
-  const done       = requests.filter(r => r.status === '리뷰완료').length
-  const totalPages = Math.max(1, Math.ceil(requests.length / PAGE_SIZE))
-  const paged      = requests.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
+  const pending          = requests.filter(r => r.status === '대기중').length
+  const done             = requests.filter(r => r.status === '리뷰완료').length
+  const totalPages       = Math.max(1, Math.ceil(requests.length / PAGE_SIZE))
+  const paged            = requests.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
+  const sumProductPrice  = requests.reduce((acc, r) => acc + (r.product_price ?? 0), 0)
+  const sumReviewCost    = requests.reduce((acc, r) => acc + (r.review_cost  ?? 0), 0)
 
   const thClass = "px-2.5 py-2 text-center font-semibold text-[11px] tracking-wide border-r border-gray-700 last:border-0"
   const tdClass = "px-2.5 py-1.5 text-center"
@@ -185,6 +191,14 @@ export default function RequestsPage() {
                 <option value="">전체</option>
                 <option value="대기중">대기중</option>
                 <option value="리뷰완료">리뷰완료</option>
+              </select>
+            </div>
+            <div className="flex flex-col gap-0.5">
+              <label className="text-[11px] text-gray-400 dark:text-gray-500">요청자</label>
+              <select value={filter.requester} onChange={e => set('requester', e.target.value)}
+                className="border border-gray-200 dark:border-gray-600 rounded-md px-2.5 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-gray-900 dark:bg-gray-700 dark:text-gray-100 w-28">
+                <option value="">전체</option>
+                {requesters.map(r => <option key={r} value={r}>{r}</option>)}
               </select>
             </div>
             <div className="flex flex-col gap-0.5">
@@ -320,21 +334,125 @@ export default function RequestsPage() {
                       {/* 리뷰비용 */}
                       <td className={`${tdClass} font-semibold text-gray-900`}>{r.review_cost?.toLocaleString() ?? '-'}원</td>
                       {/* 주문번호 */}
-                      <td className={`${tdClass} font-mono text-gray-500 max-w-[130px] truncate`}>{r.order_number || '-'}</td>
+                      <td className={tdClass} onClick={e => e.stopPropagation()}>
+                        {editingNote?.id === r.id && editingNote.field === 'order_number' ? (
+                          <input autoFocus value={editingNote.value}
+                            onChange={e => setEditingNote(prev => prev ? { ...prev, value: e.target.value } : null)}
+                            onBlur={saveNote}
+                            onKeyDown={e => { if (e.key === 'Enter') saveNote(); if (e.key === 'Escape') setEditingNote(null) }}
+                            className="w-32 border border-blue-400 rounded px-1.5 py-0.5 text-xs font-mono focus:outline-none dark:bg-gray-700 dark:text-gray-100" />
+                        ) : (
+                          <span onClick={() => setEditingNote({ id: r.id, field: 'order_number', value: r.order_number || '' })}
+                            className={`block min-w-[80px] min-h-[18px] cursor-text rounded px-1 py-0.5 hover:bg-blue-50 dark:hover:bg-blue-900/30 text-left font-mono ${r.order_number ? 'text-gray-500 dark:text-gray-300' : 'text-gray-300 dark:text-gray-600'}`}>
+                            {r.order_number || '클릭하여 입력'}
+                          </span>
+                        )}
+                      </td>
                       {/* 구매자 */}
-                      <td className={`${tdClass} text-gray-700`}>{r.buyer || '-'}</td>
+                      <td className={tdClass} onClick={e => e.stopPropagation()}>
+                        {editingNote?.id === r.id && editingNote.field === 'buyer' ? (
+                          <input autoFocus value={editingNote.value}
+                            onChange={e => setEditingNote(prev => prev ? { ...prev, value: e.target.value } : null)}
+                            onBlur={saveNote}
+                            onKeyDown={e => { if (e.key === 'Enter') saveNote(); if (e.key === 'Escape') setEditingNote(null) }}
+                            className="w-20 border border-blue-400 rounded px-1.5 py-0.5 text-xs focus:outline-none dark:bg-gray-700 dark:text-gray-100" />
+                        ) : (
+                          <span onClick={() => setEditingNote({ id: r.id, field: 'buyer', value: r.buyer || '' })}
+                            className={`block min-w-[48px] min-h-[18px] cursor-text rounded px-1 py-0.5 hover:bg-blue-50 dark:hover:bg-blue-900/30 text-left ${r.buyer ? 'text-gray-700 dark:text-gray-200' : 'text-gray-300 dark:text-gray-600'}`}>
+                            {r.buyer || '클릭하여 입력'}
+                          </span>
+                        )}
+                      </td>
                       {/* 수취인 */}
-                      <td className={`${tdClass} text-gray-700`}>{r.recipient || '-'}</td>
+                      <td className={tdClass} onClick={e => e.stopPropagation()}>
+                        {editingNote?.id === r.id && editingNote.field === 'recipient' ? (
+                          <input autoFocus value={editingNote.value}
+                            onChange={e => setEditingNote(prev => prev ? { ...prev, value: e.target.value } : null)}
+                            onBlur={saveNote}
+                            onKeyDown={e => { if (e.key === 'Enter') saveNote(); if (e.key === 'Escape') setEditingNote(null) }}
+                            className="w-20 border border-blue-400 rounded px-1.5 py-0.5 text-xs focus:outline-none dark:bg-gray-700 dark:text-gray-100" />
+                        ) : (
+                          <span onClick={() => setEditingNote({ id: r.id, field: 'recipient', value: r.recipient || '' })}
+                            className={`block min-w-[48px] min-h-[18px] cursor-text rounded px-1 py-0.5 hover:bg-blue-50 dark:hover:bg-blue-900/30 text-left ${r.recipient ? 'text-gray-700 dark:text-gray-200' : 'text-gray-300 dark:text-gray-600'}`}>
+                            {r.recipient || '클릭하여 입력'}
+                          </span>
+                        )}
+                      </td>
                       {/* 전화번호 */}
-                      <td className={`${tdClass} text-gray-600`}>{r.phone || '-'}</td>
+                      <td className={tdClass} onClick={e => e.stopPropagation()}>
+                        {editingNote?.id === r.id && editingNote.field === 'phone' ? (
+                          <input autoFocus value={editingNote.value}
+                            onChange={e => setEditingNote(prev => prev ? { ...prev, value: e.target.value } : null)}
+                            onBlur={saveNote}
+                            onKeyDown={e => { if (e.key === 'Enter') saveNote(); if (e.key === 'Escape') setEditingNote(null) }}
+                            className="w-28 border border-blue-400 rounded px-1.5 py-0.5 text-xs focus:outline-none dark:bg-gray-700 dark:text-gray-100" />
+                        ) : (
+                          <span onClick={() => setEditingNote({ id: r.id, field: 'phone', value: r.phone || '' })}
+                            className={`block min-w-[72px] min-h-[18px] cursor-text rounded px-1 py-0.5 hover:bg-blue-50 dark:hover:bg-blue-900/30 text-left ${r.phone ? 'text-gray-600 dark:text-gray-300' : 'text-gray-300 dark:text-gray-600'}`}>
+                            {r.phone || '클릭하여 입력'}
+                          </span>
+                        )}
+                      </td>
                       {/* 주소 */}
-                      <td className={`${tdClass} text-gray-600 max-w-[160px] truncate`}>{r.address || '-'}</td>
+                      <td className={tdClass} onClick={e => e.stopPropagation()}>
+                        {editingNote?.id === r.id && editingNote.field === 'address' ? (
+                          <input autoFocus value={editingNote.value}
+                            onChange={e => setEditingNote(prev => prev ? { ...prev, value: e.target.value } : null)}
+                            onBlur={saveNote}
+                            onKeyDown={e => { if (e.key === 'Enter') saveNote(); if (e.key === 'Escape') setEditingNote(null) }}
+                            className="w-44 border border-blue-400 rounded px-1.5 py-0.5 text-xs focus:outline-none dark:bg-gray-700 dark:text-gray-100" />
+                        ) : (
+                          <span onClick={() => setEditingNote({ id: r.id, field: 'address', value: r.address || '' })}
+                            className={`block max-w-[160px] truncate min-h-[18px] cursor-text rounded px-1 py-0.5 hover:bg-blue-50 dark:hover:bg-blue-900/30 text-left ${r.address ? 'text-gray-600 dark:text-gray-300' : 'text-gray-300 dark:text-gray-600'}`}>
+                            {r.address || '클릭하여 입력'}
+                          </span>
+                        )}
+                      </td>
                       {/* 은행명 */}
-                      <td className={`${tdClass} text-gray-700`}>{r.bank || '-'}</td>
+                      <td className={tdClass} onClick={e => e.stopPropagation()}>
+                        {editingNote?.id === r.id && editingNote.field === 'bank' ? (
+                          <input autoFocus value={editingNote.value}
+                            onChange={e => setEditingNote(prev => prev ? { ...prev, value: e.target.value } : null)}
+                            onBlur={saveNote}
+                            onKeyDown={e => { if (e.key === 'Enter') saveNote(); if (e.key === 'Escape') setEditingNote(null) }}
+                            className="w-20 border border-blue-400 rounded px-1.5 py-0.5 text-xs focus:outline-none dark:bg-gray-700 dark:text-gray-100" />
+                        ) : (
+                          <span onClick={() => setEditingNote({ id: r.id, field: 'bank', value: r.bank || '' })}
+                            className={`block min-w-[48px] min-h-[18px] cursor-text rounded px-1 py-0.5 hover:bg-blue-50 dark:hover:bg-blue-900/30 text-left ${r.bank ? 'text-gray-700 dark:text-gray-200' : 'text-gray-300 dark:text-gray-600'}`}>
+                            {r.bank || '클릭하여 입력'}
+                          </span>
+                        )}
+                      </td>
                       {/* 계좌번호 */}
-                      <td className={`${tdClass} font-mono text-gray-600`}>{r.account || '-'}</td>
+                      <td className={tdClass} onClick={e => e.stopPropagation()}>
+                        {editingNote?.id === r.id && editingNote.field === 'account' ? (
+                          <input autoFocus value={editingNote.value}
+                            onChange={e => setEditingNote(prev => prev ? { ...prev, value: e.target.value } : null)}
+                            onBlur={saveNote}
+                            onKeyDown={e => { if (e.key === 'Enter') saveNote(); if (e.key === 'Escape') setEditingNote(null) }}
+                            className="w-28 border border-blue-400 rounded px-1.5 py-0.5 text-xs font-mono focus:outline-none dark:bg-gray-700 dark:text-gray-100" />
+                        ) : (
+                          <span onClick={() => setEditingNote({ id: r.id, field: 'account', value: r.account || '' })}
+                            className={`block min-w-[64px] min-h-[18px] cursor-text rounded px-1 py-0.5 hover:bg-blue-50 dark:hover:bg-blue-900/30 text-left font-mono ${r.account ? 'text-gray-600 dark:text-gray-300' : 'text-gray-300 dark:text-gray-600'}`}>
+                            {r.account || '클릭하여 입력'}
+                          </span>
+                        )}
+                      </td>
                       {/* 예금주 */}
-                      <td className={`${tdClass} font-semibold text-gray-900`}>{r.depositor || '-'}</td>
+                      <td className={tdClass} onClick={e => e.stopPropagation()}>
+                        {editingNote?.id === r.id && editingNote.field === 'depositor' ? (
+                          <input autoFocus value={editingNote.value}
+                            onChange={e => setEditingNote(prev => prev ? { ...prev, value: e.target.value } : null)}
+                            onBlur={saveNote}
+                            onKeyDown={e => { if (e.key === 'Enter') saveNote(); if (e.key === 'Escape') setEditingNote(null) }}
+                            className="w-20 border border-blue-400 rounded px-1.5 py-0.5 text-xs focus:outline-none dark:bg-gray-700 dark:text-gray-100" />
+                        ) : (
+                          <span onClick={() => setEditingNote({ id: r.id, field: 'depositor', value: r.depositor || '' })}
+                            className={`block min-w-[48px] min-h-[18px] cursor-text rounded px-1 py-0.5 hover:bg-blue-50 dark:hover:bg-blue-900/30 text-left font-semibold ${r.depositor ? 'text-gray-900 dark:text-gray-100' : 'text-gray-300 dark:text-gray-600'}`}>
+                            {r.depositor || '클릭하여 입력'}
+                          </span>
+                        )}
+                      </td>
                       {/* 리뷰타입 */}
                       <td className={tdClass}>
                         {r.review_type ? (
@@ -423,6 +541,22 @@ export default function RequestsPage() {
                   </>
                 ))}
               </tbody>
+              {!loading && requests.length > 0 && (
+                <tfoot>
+                  <tr className="bg-gray-800 dark:bg-gray-900 border-t-2 border-gray-600">
+                    <td colSpan={7} className="px-2.5 py-2 text-center text-[11px] font-bold text-gray-200">
+                      소계 {requests.length.toLocaleString()}건
+                    </td>
+                    <td className="px-2.5 py-2 text-center text-[11px] font-bold text-white">
+                      {sumProductPrice.toLocaleString()}원
+                    </td>
+                    <td className="px-2.5 py-2 text-center text-[11px] font-bold text-yellow-300">
+                      {sumReviewCost.toLocaleString()}원
+                    </td>
+                    <td colSpan={14} />
+                  </tr>
+                </tfoot>
+              )}
             </table>
           </div>
         </div>

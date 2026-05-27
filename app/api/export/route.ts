@@ -8,24 +8,26 @@ export async function GET(req: Request) {
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { searchParams } = new URL(req.url)
-  const status   = searchParams.get('status')    || ''
-  const search   = searchParams.get('search')    || ''
-  const platform = searchParams.get('platform')  || ''
-  const keyword  = searchParams.get('keyword')   || ''
-  const dateFrom = searchParams.get('date_from') || ''
-  const dateTo   = searchParams.get('date_to')   || ''
+  const status    = searchParams.get('status')    || ''
+  const search    = searchParams.get('search')    || ''
+  const requester = searchParams.get('requester') || ''
+  const platform  = searchParams.get('platform')  || ''
+  const keyword   = searchParams.get('keyword')   || ''
+  const dateFrom  = searchParams.get('date_from') || ''
+  const dateTo    = searchParams.get('date_to')   || ''
 
   const rows = await sql`
     SELECT * FROM purchase_requests
     WHERE
-      (${status}   = '' OR status   = ${status})
-      AND (${platform} = '' OR platform = ${platform})
-      AND (${keyword}  = '' OR keyword  = ${keyword})
+      (${status}    = '' OR status    = ${status})
+      AND (${requester} = '' OR requester = ${requester})
+      AND (${platform}  = '' OR platform  = ${platform})
+      AND (${keyword}   = '' OR keyword   = ${keyword})
       AND (${search}   = '' OR depositor    ILIKE ${'%' + search + '%'}
                             OR order_number ILIKE ${'%' + search + '%'}
                             OR buyer        ILIKE ${'%' + search + '%'})
-      AND (${dateFrom} = '' OR created_at >= ${dateFrom}::date)
-      AND (${dateTo}   = '' OR created_at <  (${dateTo}::date + interval '1 day'))
+      AND (${dateFrom} = '' OR (created_at + interval '9 hours')::date >= ${dateFrom}::date)
+      AND (${dateTo}   = '' OR (created_at + interval '9 hours')::date <= ${dateTo}::date)
     ORDER BY created_at DESC
   `
 
@@ -70,7 +72,7 @@ export async function GET(req: Request) {
   XLSX.utils.book_append_sheet(wb, ws, '구매신청목록')
   const buf: Uint8Array = XLSX.write(wb, { bookType: 'xlsx', type: 'array' })
 
-  const today = new Date().toISOString().split('T')[0]
+  const today = new Date(Date.now() + 9 * 60 * 60 * 1000).toISOString().split('T')[0]
   const filename = encodeURIComponent(`구매신청목록_${today}.xlsx`)
 
   return new NextResponse(Buffer.from(buf), {
